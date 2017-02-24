@@ -9,7 +9,7 @@ Created using Visual Studio and the dotnetcore framework.
 
 Look at the video recording for a quick tour ot the user experience: [Video](MoreInfo/VeggieShop%2BWhiteCollar-0.8.mp4)
 
-To be browsed using a compliant client ([i.e. Tommy Thorsen one](https://github.com/tommythorsen/webpayments-demo/tree/gh-pages/clients))
+To be browsed using a compliant client ([i.e. Tommy's Chromium](https://github.com/tommythorsen/webpayments-demo/tree/gh-pages/clients))
 
 ## Current Features
 -	Handles multiple payment methods:
