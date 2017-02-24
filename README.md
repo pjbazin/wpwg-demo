@@ -1,11 +1,13 @@
 # Payment Request and Apps Demo (2017/02/24)
 
 ## Version Status (0.8.02xx)
-This code to demonstrate the features of the W3C payment menthods management.
+This code to demonstrate the features of the W3C payment methods management.
+
 Created using Visual Studio and the dotnetcore framework.
 And also a video recording for a quick tour : [Video](MoreInfo/VeggieShop%2BWhiteCollar-0.8.mp4)
-- The demo shop : VeggieShopping
-- The Credit Transfer payment app (currently a basic framework to be completed)
+- The demo shop : [VeggieShopping](VeggieShop)
+- The Credit Transfer payment app : [WhiteCollar](WhiteCollar) 
+
 To be browsed using a compliant client ([i.e. Tommy Thorsen one](https://github.com/tommythorsen/webpayments-demo/tree/gh-pages/clients))
 
 ## Current Features
@@ -21,7 +23,7 @@ To be browsed using a compliant client ([i.e. Tommy Thorsen one](https://github.
 -	Registration and more around the service worker control
 
 ## Known Limitations
-- Fake Payment
+- Fake Payment (actual expected data flow with basic exchanges)
 - Pinpaid card-present payment to be implemented
 
 ## History
