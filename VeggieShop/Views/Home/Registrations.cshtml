@@ -1,0 +1,72 @@
+﻿@{
+  ViewData["Title"] = "Payment Page";
+}
+
+<h2><img src="~/images/delivery.png" class="hIcon" />&nbsp;Account Manager</h2>
+
+<div class="row">
+  <p>
+    Please Find here the payment providers Veggie Shopping kindly welcome.<br />
+  </p>
+  <div class="col-md-3">
+    <h3>Payment Providers</h3>
+    <ul>
+      <li>
+        <p>
+          <label>WhiteCollar:&nbsp;</label>A W3C compliant Payment Service Worker for direct Transfer&nbsp;-&nbsp;
+          <a href="https://whitecollar.emvpass.net">Info</a>.<br />
+          <a id="Install" href="">Registration</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <label>TommyPay:&nbsp;</label>The safe way to make payments on the web&nbsp;-&nbsp;
+          <a href="https://github.com/tommythorsen/webpayments-demo">Info</a>.<br />
+          <a href="https://tommythorsen.github.io/webpayments-demo/payment-apps/tommypay/">Registration</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <label>Bob Pay:&nbsp;</label>By Rouslan Solomakhin&nbsp;-&nbsp;
+          <a href="https://rsolomakhin.github.io/">Info</a>.<br />
+          <a href="">Registration</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <label>Pinpaid:&nbsp;</label>Paying online is as secure as paying in a store&nbsp;-&nbsp;
+          <a href="http://www.pinpaid.net/">Info</a>.<br />
+          <a href="">Registration</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <label>PayPal:&nbsp;</label>The simpler, safer way to pay and get paid&nbsp;-&nbsp;
+          <a href="https://www.paypal.com/uk/webapps/mpp/home">Info</a>.<br />
+          <a href="">Registration</a>
+        </p>
+      </li>
+    </ul>
+  </div>
+  <div id="account" class="col-md-3">
+    <h3>My Account</h3>
+    <ul>
+      <li>
+        <p>
+          <label>Orders:&nbsp;</label><br />
+          (available soon)
+        </p>
+      </li>
+      <li>
+        <p>
+          <label>Payments:&nbsp;</label><br />
+          (available soon)
+        </p>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  $("#Install").attr('href', "https://whitecollar.emvpass.net/Install.cshtml?from=" + window.location.href);
+</script>

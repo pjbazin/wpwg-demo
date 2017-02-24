@@ -1,0 +1,393 @@
+﻿@{
+  ViewData["Title"] = "Welcome";
+}
+<h2><img src="~/images/cart.png" class="hIcon" />&nbsp;@ViewData["Title"].</h2>
+<table>
+  <tr>
+    <td><h4>Pick your choice...</h4></td>
+    <td><input id="NewOrder" type="button" value="New Order" onclick="onClick_newOrder()" /></td>
+  </tr>
+</table>
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+  <ol class="carousel-indicators">
+    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+    <li data-target="#myCarousel" data-slide-to="1"></li>
+    <li data-target="#myCarousel" data-slide-to="2"></li>
+    <li data-target="#myCarousel" data-slide-to="3"></li>
+  </ol>
+  <div class="carousel-inner" role="listbox">
+    <div class="item active">
+      <a onclick="addItem(items.carrots)"><img src="~/images/carrots.jpg" class="img-responsive" /></a>
+      <div class="carousel-caption" role="option">
+        <p>Carrots</p>
+      </div>
+    </div>
+    <div class="item">
+      <a onclick="addItem(items.kales)"><img src="~/images/kale.jpg" class="img-responsive" /></a>
+      <div class="carousel-caption" role="option">
+        <p>Kales</p>
+      </div>
+    </div>
+    <div class="item">
+      <a onclick="addItem(items.potatoes)"><img src="~/images/potato.jpg" class="img-responsive" /></a>
+      <div class="carousel-caption" role="option">
+        <p>Potatoes</p>
+      </div>
+    </div>
+    <div class="item">
+      <a onclick="addItem(items.tomatoes)"><img src="~/images/tomato.jpg" class="img-responsive" /></a>
+      <div class="carousel-caption" role="option">
+        <p>Tomatoes</p>
+      </div>
+    </div>
+  </div>
+  <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+<br />
+
+<div class="row">
+  <div Id="Order" class="col-md-3">
+    <h2>My Order</h2>
+    <table class="form-input">
+      <tr>
+        <th><label for="ref">Order#:&nbsp;</label></th>
+        <th colspan="2"><input type="text" name="ref" /><br /></th>
+      </tr>
+      <tr>
+        <td><label for="price">Price:&nbsp;</label></td>
+        <td><input type="text" name="price" /><br /></td>
+        <td><h6 id="added">(added ###)</h6></td>
+      </tr>
+      <tr>
+        <td><label for="tax">Sales Tax:&nbsp;</label></td>
+        <td><input type="text" name="tax" /><br /></td>
+        <td><input type="button" value="Update Total" onclick="updateTotal()" /></td>
+      </tr>
+    </table>
+  </div>
+  <div id="PayRequest" class="col-md-3">
+    <h2 class="">I Pay</h2>
+    <h6>(<a href="~/Home/Registrations">App Registrations</a>)</h6>
+    <table class="form-input">
+      <tr>
+        <th><label for="total">Total:&nbsp;</label></th>
+        <th><input type="text" name="total" /></th>
+        <th><label><input name="shipTo" type="checkbox" />&nbsp;Shipping</label></th>
+      </tr>
+      <tr>
+        <td><label>add:&nbsp;</label></td>
+        <td colspan="2">
+          <label><input name="payerName" type="checkbox" checked />&nbsp;Name</label>
+          <label><input name="payerEmail" type="checkbox" checked />&nbsp;Email</label>
+          <label><input name="payerPhone" type="checkbox" checked />&nbsp;Phone</label>
+        </td>
+      </tr>
+      <tr>
+        <td><label for="total">via:&nbsp;</label></td>
+        <td>
+          <select id="payMode" onchange="selectPayMode()">
+            <option>W3C Methods</option>
+            <option disabled>Pinpaid Channel</option>
+            <option disabled>Paypal</option>
+          </select>
+        </td>
+        <td><input type="button" value="Pay" onclick="onClick_pay()" /></td>
+      </tr>
+    </table>
+  </div>
+  <div id="PayResponse" class="col-md-3">
+    <h2>Payment Status:</h2>&nbsp;<h6><u id="result"></u></h6>
+    <table class="form-output">
+      <tr>
+        <td><label>Method:&nbsp;</label><span id="methodName"></span></td>
+      </tr>
+      <tr>
+        <td><label>Response Details:&nbsp;</label><span id="details"></span></td>
+      </tr>
+      <tr class="shipping">
+        <td><label>To be delivered to:&nbsp;</label><span id="shipTo"></span></td>
+      </tr>
+      <tr class="shipping">
+        <td><label>Shipping Mode:&nbsp;</label><span id="shipToMode"></span></td>
+      </tr>
+      <tr class="payer">
+        <td><label>Payer:&nbsp;</label><span id="contact"></span></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+@section scripts {
+  <script>
+    // Common vars
+    var ref = document.querySelector("[name='ref']");
+    var price = document.querySelector("[name='price']");
+    var tax = document.querySelector("[name='tax']");
+    var total = document.querySelector("[name='total']");
+    var shipTo = document.querySelector("[name='shipTo']");
+    var payerName = document.querySelector("[name='payerName']");
+    var payerEmail = document.querySelector("[name='payerEmail']");
+    var payerPhone = document.querySelector("[name='payerPhone']");
+    var payMode = selectPayMode();
+    var ticket;
+
+
+    function selectItem(itemNum) {
+      var itemIx = -1;
+      document.querySelectorAll("li[data-target='#myCarousel']").forEach(el => el.className = (++itemIx == itemNum) ? "active" : "");
+      itemIx = -1;
+      document.querySelectorAll("div.item").forEach(el => el.className = (++itemIx == itemNum) ? "item active" : "item");
+    }
+
+
+    // Select an item to be addded to the list
+    function addItem(item) {
+      if (typeof item != 'undefined') {
+        var added = document.querySelector("#added");
+        added.style.display = "inline";
+        added.innerText = "added (" + item.name + ")";
+        price.value = (parseFloat(price.value || "0") + item.price).toFixed(2);
+        updateTotal();
+      }
+    }
+
+
+    // Reset order count
+    function onClick_newOrder() {
+      ref.value = "Vegg-" + Date.now();
+      tax.value = "20%";
+      price.value = "";
+      total.value = "";
+      document.querySelector("#NewOrder").style.display = "none";
+      showColumns('Order', 'PayRequest');
+    }
+
+
+    function showColumns() {
+      var set = new Set(arguments);
+      document.querySelectorAll(".col-md-3").forEach(el =>  el.style.display = set.has(el.id) ? "block" : "none");
+    }
+
+    // Compute order total
+    function updateTotal() {
+      order.ref = ref.value;
+      order.price = price.value;
+      order.tax = addRelativeValue(order.price, tax.value);
+      total.value = parseFloat(order.price + order.tax).toFixed(2);
+      order.total = parseFloat(total.value);
+    }
+
+
+    function addRelativeValue(base, addOn) {
+      var val = (addOn && (addOn[addOn.length - 1] == "%")) ?
+        parseFloat(base * (parseFloat(addOn) / 100)) :
+        parseFloat(addOn || "0");
+      return parseFloat(val.toFixed(2));
+    }
+
+
+    function selectPayMode() {
+      payMode = document.querySelector("#payMode").value;
+    }
+
+    // Update screen display with Payment request feedback
+    function showResponse() {
+      document.querySelector("#NewOrder").style.display = "inline";
+      showColumns('PayResponse');
+
+
+      document.querySelector("#methodName").innerText = ticket.methodName;
+      switch (ticket.methodName) {
+        case "https://whitecollar.emvpass.net/pay":
+          document.querySelector("#result").innerText = ticket.details.accepted ? "Accepted" : "Rejected";
+          document.querySelector("#details").innerText = ticket.details.reference;
+          break;
+        case "basic-card":
+          document.querySelector("#details").innerText = "Card " + '...XXXX-' + ticket.details.cardNumber.substr(12);
+          break;
+        case "https://tommypay.no/pay":
+          document.querySelector("#details").innerText = ticket.details.test || "Unexpected missing details";
+          break;
+        default:
+          document.querySelector("#details").innerText = JSON.stringify(ticket.details, null, '\r');
+          break;
+      }
+
+      if (ticket.shippingAddress) {
+        var add = document.querySelector("#shipTo");
+        add.innerText = ticket.shippingAddress.recipient;
+        ticket.shippingAddress.addressLine.forEach(el =>  add.innerText += "\n" + el);
+        add.innerText += ("\n" + ticket.shippingAddress.country + "-" + ticket.shippingAddress.postalCode + " " + ticket.shippingAddress.city);
+        document.querySelector("#shipToMode").innerText = ticket.shippingOption;
+        document.querySelectorAll(".shipping").forEach(el => el.style.display = 'block');
+      }
+      document.querySelector("#contact").innerText =
+        (ticket.payerName || ticket.recipient || ticket.cardholderName || "Unkown") + "\n" +
+        "(" + (ticket.payerPhone || ticket.phone || "[No Phone]") + ")\n" +
+        (ticket.payerEmail || "[No Email]");
+      document.querySelectorAll(".payer").forEach(el => el.style.display = 'block');
+    }
+
+
+    selectItem(Math.floor(4 * Math.random()));
+    onClick_newOrder();
+  </script>
+
+  <script>
+    // Payment request Call
+    function onClick_pay() {
+      Log.start("onClick_pay");
+
+      // PaymentRequest Method Data
+      var methodData = [
+        {
+          supportedMethods: ["basic-card"], // 'amex', 'diners', 'discover', 'jcb', 'mastercard', 'unionpay', 'visa'
+          //data: {
+          //  supportedNetworks: ['amex'],
+          //  supportedTypes: ['debit']
+          //}
+        },
+        {
+          supportedMethods: [
+            "https://whitecollar.emvpass.net/pay",
+            "https://tommypay.no/pay",
+            "https://americanexpress.com/express-checkout",
+            "https://rsolomakhin.github.io/bobpay"
+          ]
+        }
+      ];
+      // PaymentRequest Method Details
+      details = {
+        total: {
+          label: order.ref,
+          amount: { currency: order.currency, value: order.total }
+        },
+        displayItems: [
+          {
+            label: "Price",
+            amount: { currency: order.currency, value: order.price }
+          },
+          {
+            label: "Sales Tax",
+            amount: { currency: order.currency, value: order.tax },
+          },
+          {
+            label: "Shipping",
+            amount: { currency: order.currency, value: order.shipping },
+          }
+        ],
+        shippingOptions: [
+             {
+               id: "free",
+               label: "Slow shipping",
+               amount: { currency: order.currency, value: "0" },
+               selected: true
+             },
+             {
+               id: "regular",
+               label: "Regular shipping",
+               amount: { currency: order.currency, value: "2.00" },
+               selected: false
+             },
+             {
+               id: "express",
+               label: "Express shipping",
+               amount: { currency: order.currency, value: "5.00" },
+               selected: false
+             }
+        ],
+      }
+      /*
+      modifiers: [
+     {
+       supportedMethods: ["https://whitecollar.emvpass.net/pay"],
+       total: {
+         label: "Total (with Tax)",
+         amount: { currency: order.currency, value: order.total }
+       },
+       additionalDisplayItems: [
+           {
+             label: "Tax",
+             amount: { currency: order.currency, value: order.tax }
+           }
+       ]
+     }
+      ]*/
+      //PaymentRequest Options
+      options = {
+        requestPayerName: payerName.checked,
+        requestPayerEmail: payerEmail.checked,
+        requestPayerPhone: payerPhone.checked,
+        requestShipping: shipTo.checked
+      };
+
+      try {
+        request = new PaymentRequest(methodData, details, options);
+        addListeners(request);
+        request.show().then(handlePaymentResponse).catch(handlePaymentError);
+      } catch (ex) {
+        Log.error(ex);
+      }
+    }
+
+
+    // Add feedback listeners to the payment Request
+    function addListeners(request) {
+      request.addEventListener("shippingaddresschange", event => {
+        Log.write("shipping address changed", event, request.shippingAddress);
+        // Check address acceptance here before to resolve or reject promise - details.error if necessary
+        event.updateWith(Promise.resolve(details));
+      });
+
+      request.addEventListener("shippingoptionchange", event => {
+        Log.write("shipping option changed", event, request.shippingOption);
+        // Check option validity here and resolve or reject promise - details.error if necessary
+        details.shippingOptions.forEach(option => {
+          option.selected = (option.id === request.shippingOption);
+          if (option.selected) {
+            var total = 0;
+            details.displayItems.forEach(item => {
+              if (item.label == 'Shipping') item.amount.value = option.amount.value;
+              total += parseFloat(item.amount.value);
+            });
+            details.total.amount.value = total.toFixed(2);
+          }
+        });
+        event.updateWith(Promise.resolve(details));
+      });
+    }
+
+
+    // Handle Payment Response Success
+    function handlePaymentResponse(paymentResponse) {
+      Log.write("Payment request succeed", paymentResponse);
+
+      if (paymentResponse) {
+        ticket = paymentResponse;
+        paymentResponse.complete('success').then(showResponse).catch(Log.error);
+      } else {
+        Log.write("No Payment response.");
+      }
+    }
+
+
+    // Handle Payment Response Error
+    function handlePaymentError(paymentResponse) {
+      Log.write("Payment request failure", paymentResponse);
+
+      if (paymentResponse) {
+        paymentResponse.complete('fail').then(Log.error).catch(Log.error);
+      } else {
+        Log.write("No Payment response.");
+      }
+    }
+  </script>
+}
