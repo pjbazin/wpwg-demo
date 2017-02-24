@@ -4,9 +4,10 @@
 This code to demonstrate the features of the W3C payment methods management.
 
 Created using Visual Studio and the dotnetcore framework.
-And also a video recording for a quick tour : [Video](MoreInfo/VeggieShop%2BWhiteCollar-0.8.mp4)
 - The demo shop : [VeggieShopping](VeggieShop)
-- The Credit Transfer payment app : [WhiteCollar](WhiteCollar) 
+- The Credit Transfer payment app : [WhiteCollar](WhiteCollar)
+
+Look at the video recording for a quick tour ot the user experience: [Video](MoreInfo/VeggieShop%2BWhiteCollar-0.8.mp4)
 
 To be browsed using a compliant client ([i.e. Tommy Thorsen one](https://github.com/tommythorsen/webpayments-demo/tree/gh-pages/clients))
 
@@ -27,4 +28,4 @@ To be browsed using a compliant client ([i.e. Tommy Thorsen one](https://github.
 - Pinpaid card-present payment to be implemented
 
 ## History
-- Based on [Tommy Thorsen demo](https://github.com/tommythorsen/webpayments-demo) and [Rouslan Solomakhin Payment request tutorial](https://github.com/rsolomakhin)
+- Based on [Tommy Thorsen's demo](https://github.com/tommythorsen/webpayments-demo) and [Rouslan Solomakhin's PaymentRequest tutorial](https://rsolomakhin.github.io/)
