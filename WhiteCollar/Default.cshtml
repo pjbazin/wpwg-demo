@@ -1,0 +1,36 @@
+﻿@{
+  Layout = "~/_SiteLayout.cshtml";
+  Page.Title = "Welcome";
+}
+
+@section featured {
+  <section class="featured">
+    <div class="content-wrapper">
+      <hgroup class="title">
+        <h1>@Page.Title.</h1>
+        <h2>Know more.</h2>
+      </hgroup>
+      <p>
+        <i>(work-in-progress experiment on the various payment features)</i>.
+      </p>
+    </div>
+  </section>
+}
+
+<h3>How to Proceed?</h3>
+
+<ol class="round">
+  <li class="one">
+    <h5>Read Presentation and Advantages</h5>
+    <p>
+      Pay with WhiteCollar, a W3C compliant Payment Service Worker<br />
+      <i>(more details to come here)</i>.
+    </p>
+  </li>
+
+  <li class="two">
+    <h5>Install the payment service in your browser</h5>
+    <p>Go to the <a href="~/Install.cshtml">Installation Page</a></p>
+    
+  </li>
+</ol>

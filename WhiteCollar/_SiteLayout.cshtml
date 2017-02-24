@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>@Page.Title - WhiteCollar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+  <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+  <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+  <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+  <script src="~/Scripts/jquery-ui-1.10.3.js"></script>
+  <script src="~/Scripts/modernizr-2.6.2.js"></script>
+  <script src="~/Scripts/jpp/jpp.log.js"></script>
+</head>
+<body>
+  <header>
+    <div class="content-wrapper">
+      <div class="float-left">
+        <table>
+          <tr>
+            <td>
+              <a href=""><img src="/Images/wallet.png" /></a>
+            </td>
+            <td><p class="site-title">WhiteCollar<br />Service</p></td>
+          </tr>
+        </table>
+      </div>
+      <div class="float-right">
+        <nav>
+          <ul id="menu">
+            <li><a href="~/">Home</a></li>
+            <li><a href="~/About">About</a></li>
+            <li><a href="~/Contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+  <div id="body">
+    <script>Log.enable(true, false)</script>
+    @RenderSection("featured", required: false)
+    <section class="content-wrapper main-content clear-fix">
+      @RenderBody()
+    </section>
+  </div>
+  <footer>
+    <div class="content-wrapper">
+      <div class="float-left">
+        <p>@DateTime.Now.Year - whitecollar.emvpass.net - v0.8.0221</p>
+      </div>
+    </div>
+  </footer>
+  @RenderSection("Scripts", required: false)
+</body>
+</html>

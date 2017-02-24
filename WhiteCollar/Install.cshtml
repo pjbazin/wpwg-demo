@@ -1,0 +1,238 @@
+﻿@{
+  Layout = "~/_SiteLayout.cshtml";
+  Page.Title = "Installation";
+  var From = Request.Params["from"];
+}
+
+@section featured {
+  <section class="featured">
+    <div class="content-wrapper">
+      <hgroup class="title">
+        <h1>@Page.Title.</h1>
+        <br />
+        <h2>Payment Service Installation.</h2>
+      </hgroup>
+      <p>
+        Pay with WhiteCollar, a W3C compliant Payment Service Worker for SEPA exchanges.<br />
+        <i>(work-in-progress)</i>.
+      </p>
+    </div>
+  </section>
+}
+
+<h3>Register to this Payment Service:</h3>
+
+<ol class="round">
+  <li class="one">
+    <h5>Read and accept the conditions</h5>
+    <i>(more details to come here)</i>.
+  </li>
+
+  <li class="two">
+    <h5>Fill-up the form with your account details</h5>
+    <table class="iban">
+      <tr>
+        <td><label for="owner">Owner:&nbsp;</label></td>
+        <td><input type="text" name="owner" value="" /></td>
+      </tr>
+      <tr>
+        <td><label for="iban">IBAN:&nbsp;</label></td>
+        <td><input type="text" name="iban" value="" /></td>
+      </tr>
+      <tr>
+        <td><label for="bic">BIC:&nbsp;</label></td>
+        <td><input type="text" name="bic" value="" /></td>
+      </tr>
+    </table>
+  </li>
+
+  <li class="three">
+    <h5>Install the payment service in your browser</h5>
+    <table class="funcs">
+      <tr>
+        <td><button id="install" onclick="install()">Install</button><a href="#" onclick="moreFunc()">(and&nbsp;more)</a></td>
+        <td class="moreFunc"><button id="getregister" onclick="getRegistrations()">Get</button></td>
+        <td class="moreFunc"><button id="uninstall" onclick="uninstall()">Uninstall</button></td>
+      </tr>
+      <tr>
+        <td class="moreFunc" colspan="42">
+          <label for="scopes">Scope:</label>
+          <select id="scopes" onchange="selectScope()"><option>./</option></select>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="42">
+          <span id="installStatus"></span>
+        </td>
+      </tr>
+    </table>
+
+  </li>
+
+  <li class="four">
+    <h5>Close Installation</h5>
+    @if (!string.IsNullOrWhiteSpace(From))
+    {
+      <p>Return to <a href="@From">Merchant Web Site</a></p>
+    }
+    else
+    {
+      <p>Return <a href="~/">Home</a></p>
+    }
+  </li>
+
+</ol>
+
+<script>
+  function moreFunc() {
+    document.querySelectorAll(".moreFunc").forEach(function (element) {
+      element.style.display = ((element.style.display == "") || (element.style.display == "none")) ? "table-cell" : "none";
+    });
+  }
+</script>
+
+
+<script>
+  var account = {
+//    owner: "MR ET MME PASCAL BAZIN",
+//    iban: "FR7670015295010197026070748",
+//    bic: "BREDFRPPXXX"
+  };
+
+  var registrationCount = 0;
+  var installStatus = document.querySelector("#installStatus")
+  var scopes = document.querySelector("#scopes");
+  var owner = document.querySelector("[name='owner']");
+  var iban = document.querySelector("[name='iban']");
+  var bic = document.querySelector("[name='bic']");
+
+  function getAccount() {
+    account.owner = owner.value;
+    account.iban = iban.value;
+    account.bic = bic.value;
+  }
+
+  owner.value = account.owner;
+  iban.value = account.iban;
+  bic.value = account.bic;
+
+</script>
+
+<script>
+  var appDef = {
+    manifest: {
+      name: "WhiteCollar",
+      label: "WhiteCollar",
+      options: [
+      {
+        name: "WhiteCollar for SEPA Payment",
+        label: "WhiteCollar SEPA",
+        id: "WhiteCollar",
+        enabledMethods: ["https://whitecollar.emvpass.net/pay"]
+      }]
+    },
+    script: "./app.js",
+    scope: "./"
+  };
+
+
+  function install() {
+    Log.start("install");
+    installStatus.textContent = "";
+
+    getAccount();
+    appDef.manifest.options[0].name = "WhiteCollar w/ IBAN '" + account.iban.substr(0, 3) + "xxxx" + account.iban.substr(-4) + "'";
+    appDef.manifest.options[0].label = appDef.manifest.options[0].name;
+    appDef.manifest.options[0].id = account.iban;
+    Log.write(appDef);
+
+    navigator.serviceWorker.register(appDef.script, { scope: appDef.scope })
+      .then(function (registration) {
+        Log.write("Registering WhiteCollar");
+        return registration.paymentAppManager.setManifest(appDef.manifest);
+      }).then(function () {
+        moreFunc();
+        Log.write(installStatus.textContent = "Successfully registered.");
+      }).catch(function (ex) {
+        Log.error(installStatus.textContent = "Registration failed - " + ex);
+      });
+  }
+
+
+  function getRegistrations() {
+    Log.start('getRegistrations');
+    installStatus.textContent = "";
+
+    appDef.scope = null;
+
+    if (appDef.scope) {
+      navigator.serviceWorker.getRegistration(appDef.scope).then(function (registration) {
+        Log.write(registration);
+      }).then(function () {
+        Log.done();
+      }).catch(function (ex) {
+        Log.error(ex)
+      });
+    } else {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        if ((typeof registrations != 'undefined') && (registrations != null)) {
+          registrationCount = registrations.length;
+          Log.write("Registration count: " + registrationCount);
+          while (scopes.length > 1) scopes.remove(1);
+          for (registrationIndex in registrations) {
+            var registration = registrations[registrationIndex];
+            Log.write("Regitration[" + registrationIndex + "]:", registration);
+            var serviceWorker = (registration.installing != null) ? registration.installing : (
+                                (registration.waiting != null) ? registration.waiting : (
+                                (registration.active != null) ? registration.active : null));
+            if ((typeof serviceWorker != 'undefined') && (serviceWorker != null)) {
+              var option = document.createElement("option");
+              option.value = registration.scope;
+              option.innerText = registration.scope + " (" + serviceWorker.state + ")";
+              scopes.options.add(option);
+            } else {
+              Log.write("Worker: undefined")
+            }
+          }
+        } else {
+          Log.write("Registrations: undefined")
+        }
+      }).then(function () {
+        scopes.selectedIndex = scopes.length - 1;
+        selectScope();
+        installStatus.textContent = (registrationCount == 0) ? "No Registration found." : ("Scope list updated with " + registrationCount + " registration(s).");
+        Log.done(installStatus.textContent);
+      }).catch(function (ex) {
+        Log.error(installStatus.textContent = "Registration get failed: - " + ex)
+      });
+    }
+  }
+
+
+  function selectScope() {
+    appDef.scope = document.querySelector("#scopes").value;
+    Log.write("Set PayScope : " + appDef.scope);
+  }
+
+
+  function uninstall() {
+    Log.start('uninstall');
+    installStatus.textContent = "";
+
+    navigator.serviceWorker.getRegistration(appDef.scope).then(function (registration) {
+      Log.write(registration);
+      if ((typeof registration != 'undefined') && (registration != null)) {
+        registration.unregister().then(function (success) {
+          Log.write(installStatus.textContent = "Service " + (success ? "successfully" : "NOT") + " unregistered.");
+        });
+      } else {
+        Log.error(installStatus.textContent = "Uninstallation failed.");
+      }
+    }).then(function () {
+      Log.done();
+    }).catch(function (ex) {
+      Log.error(installStatus.textContent = "Uninstallation failed - " + ex);
+    });
+  }
+
+</script>

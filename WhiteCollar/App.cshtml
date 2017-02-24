@@ -1,0 +1,103 @@
+﻿@{
+  Layout = "~/_SiteLayout.cshtml";
+  Page.Title = "Payment";
+}
+
+@section featured {
+  <section class="featured">
+    <div class="content-wrapper">
+      <hgroup class="title">
+        <h1>@Page.Title.</h1>
+        <h2>SEPA Service.</h2>
+      </hgroup>
+      <p>
+        Request a SEPA payment with WhiteCollar.<br />
+        <i>(work-in-progress)</i>.
+      </p>
+    </div>
+  </section>
+}
+
+<h3>Verify your request and wait for processing:</h3>
+
+<ol class="round">
+
+  <li class="one">
+    <h5>Check payment details:</h5>
+    <span>Request Ref.: #</span><span id="ref"></span><br />
+    <span>Amount:&nbsp;</span><strong><span id="amount"></span></strong><br />
+    <span>From Payer:&nbsp;</span><strong><span id="account"></span></strong><br />
+    <span>To Payee:&nbsp;</span><span id="merchant"></span><br />
+  </li>
+
+  <li class="two">
+    <h5>Send to banking network</h5>
+    <span>Credit Transfer:&nbsp;</span><strong><span id="wait">Please wait...</span></strong><br />
+  </li>
+
+  <li class="three">
+    <button id="btnCancel" class="btnAction" onclick="onClick_btnProcessStop()">Cancel</button>
+    <button id="btnReturn" class="btnAction" onclick="onClick_btnGoBack()" disabled>Go Back to Payee</button>
+  </li>
+
+</ol>
+
+
+<script>
+  /*** Global data for the Payment Message Response : what and where to return ***/
+  var messageEventSource;
+  var responseMessage = {
+    methodName: "https://whitecollar.emvpass.net/pay",
+    details: null
+  }
+
+
+  /*** Waiting for the incomming request from the Payment App Service Worker (app.js) ***/
+  navigator.serviceWorker.onmessage = function(messageEvent) {
+    Log.write("UI received message from SW(Service Worker)", messageEvent.data);
+    messageEventSource = messageEvent.source;
+
+    // Update the display with the payment request details while waiting for the response from the payment server
+    var paymentRequest = messageEvent.data;
+    document.querySelector("#amount").textContent = paymentRequest.total.amount.value + " " + paymentRequest.total.amount.currency;
+    document.querySelector("#account").textContent = paymentRequest.optionId;
+    document.querySelector("#merchant").textContent = paymentRequest.origin;
+    document.querySelector("#ref").textContent = paymentRequest.total.label;
+
+    // Send the Payment Request to an online server that would handle it and prepare to catch the response
+    paymentRequest = btoa(JSON.stringify(paymentRequest));
+    $.post("https://whitecollar.emvpass.net/Pay.aspx", paymentRequest, onPaymentResponse);
+    Log.write("UI forwarded request to PS(Payment Server)");
+    // Wait for PS response
+  }
+
+
+  /*** Read the Payment Server Response and Update the user display ***/
+  function onPaymentResponse(payResponseDetails, status) {
+    Log.write("UI received message from PS", payResponseDetails, "Response Status: " + status);
+    document.querySelector("#btnCancel").disabled = true;
+    payResponseDetails = JSON.parse(atob(payResponseDetails));
+    document.querySelector("#wait").textContent = payResponseDetails.accepted ? "Accepted" : "Rejected";
+    document.querySelector("#btnReturn").disabled = false;
+    responseMessage.details = payResponseDetails;
+    // user can proceed to next step now
+  }
+
+
+  /** TODO: Handle cancelation **/
+  function onClick_btnProcessStop() {
+    Log.write("Payment process was canceled");
+    // TODO: Request Payment server cancelation
+    responseMessage.details.canceled = true;
+    onClick_btnGoBack();
+  }
+
+
+  /** Send back response to Service Worker (and then to merchant) */
+  function onClick_btnGoBack() {
+    Log.write("UI post back response to Worker");
+    messageEventSource.postMessage(responseMessage);
+    window.close();
+  }
+
+</script>

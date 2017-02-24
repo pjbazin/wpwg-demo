@@ -252,3 +252,5 @@ paket-files/
 *.sln.iml
 /VeggieShop/Properties/PublishProfiles
 /bcpr/
+/Gemalto.WpWg.BcPrApp
+/Tutos
